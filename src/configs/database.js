@@ -3,5 +3,5 @@ module.exports = {
   host: 'localhost',
   user: 'luthfipratamaps',
   password: 'Alsin12354!',
-  database: 'monitoring'
+  database: 'loraiot'
 };
