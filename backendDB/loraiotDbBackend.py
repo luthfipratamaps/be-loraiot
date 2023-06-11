@@ -47,13 +47,10 @@ def connect_mqtt():
 
         # Extract and print dataList
         datasetList = msg.payload.decode().split(";")
-        first_data = []
+        temps = []
         for data in datasetList:
             if data:
-                first_element = data.split(",")[0]
-                first_data.append(first_element)
-
-        print (first_data)
+                temps.append(data.split(",")[0])
 
         # Define the temperature input variable and its membership functions
         temperature = ctrl.Antecedent(np.arange(0, 101, 1), 'temperature')
@@ -75,25 +72,25 @@ def connect_mqtt():
         shade_ctrl = ctrl.ControlSystem([rule1, rule2, rule3])
         shade_sim = ctrl.ControlSystemSimulation(shade_ctrl)
 
-        # Process each data point from the first_data list
-        for i, data_point in enumerate(first_data):
+        # Process each temp point from the temps list
+        for i, temp in enumerate(temps, start=1):
             # Set the input temperature value
-            shade_sim.input['temperature'] = float(data_point)
+            shade_sim.input['temperature'] = float(temp)
 
             # Compute the result
             shade_sim.compute()
 
-            # Convert the shade value to "yes" or "no"
-            output = "no" if shade_sim.output['shade'] <= 26 else "yes"
+            # Convert the shade value to "1" or "0"
+            output = 0 if shade_sim.output['shade'] <= 26 else 1
 
-            # i
-            print("i:", i)
-            # Print the input
-            print("Input:", data_point)
-            # Print the output
             print("Output:", output)
-            # Print the output shade value
-            print("Shade:", shade_sim.output['shade'])
+
+            # Construct the SQL query for update
+            update_query = "UPDATE nodes SET Is_Need_Shade= %s WHERE Node_Id = %s"
+            update_values = [output, i + 1]
+            print(update_values)
+            # Execute the insertion query
+            cursor.execute(update_query, update_values)
 
         # Construct the SQL query for insertion
         insert_query = "INSERT INTO monitoring_data (Tanggal, Waktu, Suhu1, RH1, SH1, IC1, Suhu2, RH2, SH2, IC2, Suhu3, RH3, SH3, IC3, Suhu4, RH4, SH4, IC4 ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
