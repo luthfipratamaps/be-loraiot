@@ -34,7 +34,7 @@ CREATE TABLE monitoring_data(
 
 DROP TABLE IF EXISTS nodes;
 CREATE TABLE nodes (
-                Node_Id INT NOT NULL AUTO_INCREMENT,
+                Node_Id INT NOT NULL,
                 Longitude FLOAT,
                 Latitude FLOAT,  
 				Is_Need_Shade BOOLEAN NOT NULL,
