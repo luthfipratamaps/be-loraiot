@@ -60,6 +60,12 @@ for day in days:
 
     current_time = datetime.strptime('00:00:00', '%H:%M:%S')
 
+# Insert data nodes
+for i in range(1, 5):
+    sql = "INSERT INTO nodes (Node_Id, Longitude, Latitude, Is_Need_Shade) VALUES (%s, %s, %s, %s)"
+    val = (i, -6.914744, 107.609810, 0)
+    cursor.execute(sql, val)
+
 # Commit the changes and close the connection
 db.commit()
 db.close()
