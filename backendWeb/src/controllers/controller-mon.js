@@ -61,5 +61,27 @@ module.exports ={
             });
             connection.release();
         })
+    },
+    downloadDataByDate(req, res){
+        const { date } = req.params;
+        console.log(date);
+        pool.getConnection(function(err, connection) {
+            if (err) throw err;
+            connection.query('SELECT * FROM monitoring_data WHERE Tanggal = ?', [date],
+            function (error, results) {
+                if(error) throw error;
+
+                let csv = `${Object.keys(results[0]).join(',')}\n`;
+                results.forEach((row) => {
+                    csv += `${Object.values(row).join(',')}\n`; // Output the values of each row
+                });
+
+                const csvData = csv;
+                res.setHeader('Content-Type', 'text/csv');
+                res.setHeader('Content-Disposition', `attachment; filename=Data-${date}.csv`);
+                res.send(csv);
+            });
+            connection.release();
+        })
     }
 }

@@ -5,5 +5,6 @@ router.get('/data', mon.getData);
 router.get('/data/:date', mon.getDataByDate);
 router.get('/monthly-data/:month', mon.getDataByMonth);
 router.get('/available-dates', mon.getAvailableDates);
+router.get('/download-data/:date', mon.downloadDataByDate);
 
 module.exports = router;
