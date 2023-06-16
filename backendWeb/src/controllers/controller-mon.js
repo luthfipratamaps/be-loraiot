@@ -83,5 +83,16 @@ module.exports ={
             });
             connection.release();
         })
-    }
+    },
+    getNodes(req, res){
+        pool.getConnection(function(err, connection) {
+            if (err) throw err;
+            connection.query('SELECT * FROM nodes',
+            function (error, results) {
+                if(error) throw error;  
+                res.json(results);
+            });
+            connection.release();
+        })
+    },
 }
