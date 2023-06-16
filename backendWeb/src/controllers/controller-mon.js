@@ -65,24 +65,44 @@ module.exports ={
     downloadDataByDate(req, res){
         const { date } = req.params;
         console.log(date);
-        pool.getConnection(function(err, connection) {
-            if (err) throw err;
-            connection.query('SELECT * FROM monitoring_data WHERE Tanggal = ?', [date],
+        pool.getConnection(function (err, connection) {
+            if (err) {
+            console.error(err); // Log the error
+            res.status(500).send('Internal Server Error'); // Send an appropriate error response
+            return; // Return to prevent further execution
+            }
+        
+            connection.query(
+            'SELECT * FROM monitoring_data WHERE Tanggal = ?',
+            [date],
             function (error, results) {
-                if(error) throw error;
-
+                if (error) {
+                console.error(error); // Log the error
+                res.status(500).send('Internal Server Error'); // Send an appropriate error response
+                connection.release(); // Release the connection
+                return; // Return to prevent further execution
+                }
+        
+                if (!results || results.length === 0) {
+                console.error('No results found.'); // Log the error
+                res.status(404).send('No data found.'); // Send an appropriate error response
+                connection.release(); // Release the connection
+                return; // Return to prevent further execution
+                }
+        
                 let csv = `${Object.keys(results[0]).join(',')}\n`;
                 results.forEach((row) => {
-                    csv += `${Object.values(row).join(',')}\n`; // Output the values of each row
+                csv += `${Object.values(row).join(',')}\n`;
                 });
-
+        
                 const csvData = csv;
                 res.setHeader('Content-Type', 'text/csv');
                 res.setHeader('Content-Disposition', `attachment; filename=Data-${date}.csv`);
                 res.send(csv);
-            });
-            connection.release();
-        })
+                connection.release();
+            }
+            );
+        });
     },
     getNodes(req, res){
         pool.getConnection(function(err, connection) {
